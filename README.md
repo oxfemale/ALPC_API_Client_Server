@@ -1,5 +1,7 @@
 # ALPC WINAPI Client and Server (NtAlpc**)
 
+![ALPC](example.png)
+
 ## Overview
 
 This small project demonstrates inter-process communication on Windows using the Advanced Local Procedure Call (ALPC) native APIs (NtAlpc*). It contains two example programs:
