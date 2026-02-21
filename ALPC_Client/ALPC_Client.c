@@ -6,6 +6,7 @@
 
 #define MSG_LEN 0x100
 
+// Create a memory buffer for the message to be sent to the server. This buffer will contain the PORT_MESSAGE struct followed by the message data.
 LPVOID CreateMsgMem(PPORT_MESSAGE PortMessage, SIZE_T MessageSize, LPVOID Message)
 {
     /*
@@ -30,11 +31,15 @@ void main()
     CHAR            szInput[MSG_LEN];
 
     printf("ALPC-Example Client\n");
+
     RtlInitUnicodeString(&usPort, L"\\RPC Control\\NameOfPort");
     RtlSecureZeroMemory(&pmSend, sizeof(pmSend));
+
     pmSend.u1.s1.DataLength = MSG_LEN;
     pmSend.u1.s1.TotalLength = pmSend.u1.s1.DataLength + sizeof(pmSend);
+
     lpMem = CreateMsgMem(&pmSend, MSG_LEN, L"Hello World!");
+	// Connect to the server
     ntRet = NtAlpcConnectPort(&hPort, &usPort, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL);
 
     printf("[i] NtAlpcConnectPort: 0x%X\n", ntRet);
@@ -50,7 +55,9 @@ void main()
             fgets(&szInput, MSG_LEN, stdin);
             pmSend.u1.s1.DataLength = strlen(szInput);
             pmSend.u1.s1.TotalLength = pmSend.u1.s1.DataLength + sizeof(PORT_MESSAGE);
+			// Create a memory buffer for the message to be sent to the server. This buffer will contain the PORT_MESSAGE struct followed by the message data.
             lpMem = CreateMsgMem(&pmSend, pmSend.u1.s1.DataLength, &szInput);
+			// Send the message to the server and wait for a response. The response will be stored in the same memory buffer.
             ntRet = NtAlpcSendWaitReceivePort(hPort, 0, (PPORT_MESSAGE)lpMem, NULL, NULL, NULL, NULL, NULL);
             printf("[i] NtAlpcSendWaitReceivePort: 0x%X\n", ntRet);
             HeapFree(GetProcessHeap(), 0, lpMem);
